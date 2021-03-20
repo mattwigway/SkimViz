@@ -23,31 +23,34 @@ class SkimViz(tk.Frame):
         self.skims = None
 
     def create_widgets(self):
-        self.open_skimfile_bt = tk.Button(self)
+        frame = ttk.Frame(self)
+        frame.grid(column=1, row=0)
+
+        self.open_skimfile_bt = tk.Button(frame)
         self.open_skimfile_bt["text"] = "Open skim file"
         self.open_skimfile_bt["command"] = self.open_skimfile
         self.open_skimfile_bt.pack(side="top")
 
-        self.skimfile_lbl = tk.Label(self)
+        self.skimfile_lbl = tk.Label(frame)
         self.skimfile_lbl["text"] = "no file selected"
-        self.skimfile_lbl.pack(side="top")
+        self.skimfile_lbl.pack(side='top')
 
         self.current_skim = tk.StringVar('')
-        self.skim_selector = ttk.OptionMenu(self, self.current_skim)
+        self.skim_selector = ttk.OptionMenu(frame, self.current_skim)
         self.skim_selector.pack(side="top")
         self.current_skim.trace('w', self.redraw_map)
 
-        self.open_geofile_bt = tk.Button(self)
+        self.open_geofile_bt = tk.Button(frame)
         self.open_geofile_bt["text"] = 'Open geography file'
         self.open_geofile_bt["command"] = self.open_geofile
         self.open_geofile_bt.pack(side="top")
 
-        self.geofile_lbl = tk.Label(self)
+        self.geofile_lbl = tk.Label(frame)
         self.geofile_lbl["text"] = "no file selected"
         self.geofile_lbl.pack(side="top")
 
         self.geo_col = tk.StringVar('')
-        self.geo_col_selector = ttk.OptionMenu(self, self.geo_col)
+        self.geo_col_selector = ttk.OptionMenu(frame, self.geo_col)
         self.geo_col_selector.pack(side="top")
         self.geo_col.trace('w', self.redraw_map)
 
@@ -83,8 +86,6 @@ class SkimViz(tk.Frame):
         
         # TODO don't hardwire canvas size
         f, ax = plt.subplots(figsize=(12, 8))
-        self.figure = f
-        self.axes = ax
         ax.set_aspect('equal', 'box')
         ax.set_axis_off()
         skim = np.array(self.skims[self.current_skim.get()])
@@ -98,16 +99,9 @@ class SkimViz(tk.Frame):
 
         self.canvas = FigureCanvasTkAgg(f, self)
         self.canvas.mpl_connect('button_press_event', self.click)
-        self.canvas.get_tk_widget().pack(side='left')
+        self.canvas.get_tk_widget().grid(column=0, row=0)
 
     def click(self, e):
-        print(f'{self.figure.get_size_inches() * self.figure.dpi=}')
-        print(f'{(e.x, e.y)=}')
-        print()
-        inv = self.axes.transData.inverted()
-        size = self.figure.get_size_inches() * self.figure.dpi
-        #data_coords = inv.transform(np.array([e.x, e.y]))
-
         pt = Point(e.xdata, e.ydata)
         print(f'{pt.coords[:]=}')
 
